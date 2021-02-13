@@ -134,7 +134,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				if _, ok := tx[tag]; ok {
 					tx[tag].(common.MapStr)[key] = value
 				} else {
-					logp.Info("KEK ERROR!")
+					tx[tag] = common.MapStr{key: value}
 				}
 			default:
 				tx[tag] = data
