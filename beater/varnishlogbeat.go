@@ -83,7 +83,8 @@ func (vb *Varnishlogbeat) harvest() error {
 				"ObjHeader",
 				"ReqHeader",
 				"RespHeader",
-				"Timestamp":
+				"Timestamp",
+				"VCL_Log":
 				header := strings.SplitN(data, ": ", 2)
 				key := header[0]
 				var value interface{}
