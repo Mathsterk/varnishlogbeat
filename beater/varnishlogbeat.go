@@ -137,12 +137,12 @@ func (vb *Varnishlogbeat) harvest() error {
 					value = "nil"
 				}
 				if _, ok := tx[tag]; ok {
-					txcounter[string(key)]++
-					tx[tag].(common.MapStr)[key+strconv.FormatUint(txcounter[string(key)], 10)] = value
+					txcounter[string(key)] = txcounter[string(key)] + 1
+					tx[tag].(common.MapStr)[key+"."+strconv.FormatUint(txcounter[string(key)], 10)] = value
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
 					txcounter[string(key)] = 0
-					tx[tag] = common.MapStr{key + strconv.FormatUint(txcounter[string(key)], 10): value}
+					tx[tag] = common.MapStr{key + "." + strconv.FormatUint(txcounter[string(key)], 10): value}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
 			default:
