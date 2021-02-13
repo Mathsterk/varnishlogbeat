@@ -120,12 +120,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				// destroy and re-create the map
 				tx = nil
 				tx = make(common.MapStr)
-			case "VCL_Log",
-				"VCL_acl",
-				"VCL_return",
-				"VCL_call",
-				"VCL_trace",
-				"VCL_use":
+			case "VCL_Log":
 				header := strings.SplitN(data, ": ", 2)
 				key := header[0]
 				var value interface{}
