@@ -83,8 +83,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				"ObjHeader",
 				"ReqHeader",
 				"RespHeader",
-				"Timestamp",
-				"VCL_Log":
+				"Timestamp":
 				header := strings.SplitN(data, ": ", 2)
 				key := header[0]
 				var value interface{}
@@ -121,6 +120,29 @@ func (vb *Varnishlogbeat) harvest() error {
 				// destroy and re-create the map
 				tx = nil
 				tx = make(common.MapStr)
+			case "VCL_Log",
+				"VCL_acl",
+				"VCL_return",
+				"VCL_call",
+				"VCL_trace",
+				"VCL_use":
+				header := strings.SplitN(data, ": ", 2)
+				key := header[0]
+				var value interface{}
+				switch {
+				case key == "Content-Length":
+					value, _ = strconv.Atoi(header[1])
+				case len(header) == 2:
+					value = header[1]
+				// if the header is too long, header and value might get truncated
+				default:
+					value = "truncated"
+				}
+				if _, ok := tx[tag]; ok {
+					tx[tag].(common.MapStr)[key] = value
+				} else {
+					tx[tag] = common.MapStr{key: value}
+				}
 			default:
 				tx[tag] = data
 			}
