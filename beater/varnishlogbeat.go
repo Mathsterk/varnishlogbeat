@@ -63,6 +63,7 @@ func (vb *Varnishlogbeat) Run(b *beat.Beat) error {
 func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
+	txcounter := make(map[string]map[string]int)
 
 	vb.varnish.Log("",
 		vago.REQ,
@@ -132,11 +133,12 @@ func (vb *Varnishlogbeat) harvest() error {
 					value = "nil"
 				}
 				if _, ok := tx[tag]; ok {
-					tx[tag].(common.MapStr)[key] = value
+					// tx[tag].(common.MapStr)[key] = value
 				} else {
 					// tx[tag] = common.MapStr{key: value}
+					txcounter[tag][key] = 0
 					tx[tag] = common.MapStr{key: value}
-					fmt.Printf("%s %s\n", key, value)
+					fmt.Printf("%d %s %s\n", txcounter[tag][key], key, value)
 				}
 			default:
 				tx[tag] = data
