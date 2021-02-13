@@ -63,7 +63,7 @@ func (vb *Varnishlogbeat) Run(b *beat.Beat) error {
 func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
-	txcounter := make(map[string]map[string]int)
+	txcounter := make(map[string]map[string]uint64)
 
 	vb.varnish.Log("",
 		vago.REQ,
