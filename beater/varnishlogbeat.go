@@ -132,9 +132,10 @@ func (vb *Varnishlogbeat) harvest() error {
 					value = "nil"
 				}
 				if _, ok := tx[tag]; ok {
-					tx[tag].(common.MapStr)[key + "potet"] = value
+					tx[tag].(common.MapStr)[key] = value
 				} else {
-					tx[tag] = common.MapStr{key + "lol": value}
+					tx[tag] = common.MapStr{key: value}
+					logp.Info("HIRR " + tag)
 				}
 			default:
 				tx[tag] = data

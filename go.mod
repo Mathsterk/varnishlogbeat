@@ -27,8 +27,9 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20160921195207-ab2277b1c5d1 // indirect
 	github.com/satori/go.uuid v1.1.0 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
-	golang.org/x/net v0.0.0-20160304045624-d58ca6618b99 // indirect
-	golang.org/x/sys v0.0.0-20160615012701-62bee0375999 // indirect
+	golang.org/x/mod v0.4.1 // indirect
+	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.0.0-20160301204022-a83829b6f129 // indirect
 )
