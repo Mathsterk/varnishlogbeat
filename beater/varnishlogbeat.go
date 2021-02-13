@@ -134,7 +134,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				}
 				if _, ok := tx[tag]; ok {
 					txcounter[string(key)]++
-					tx[tag+string(txcounter[string(key)])].(common.MapStr)[key] = value
+					tx[tag].(common.MapStr)[key+string(txcounter[string(key)])] = value
 				} else {
 					txcounter[string(key)] = 0
 					tx[tag] = common.MapStr{key: value}
