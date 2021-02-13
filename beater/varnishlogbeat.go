@@ -121,6 +121,10 @@ func (vb *Varnishlogbeat) harvest() error {
 				// destroy and re-create the map
 				tx = nil
 				tx = make(common.MapStr)
+
+				txcounter = nil
+				txcounter = make(map[string]uint64)
+
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				key := header[0]
@@ -135,11 +139,11 @@ func (vb *Varnishlogbeat) harvest() error {
 				if _, ok := tx[tag]; ok {
 					txcounter[string(key)]++
 					tx[tag].(common.MapStr)[key+string(txcounter[string(key)])] = value
-					fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
 					txcounter[string(key)] = 0
 					tx[tag] = common.MapStr{key: value}
-					fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
 			default:
 				tx[tag] = data
