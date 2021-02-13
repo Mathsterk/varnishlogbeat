@@ -126,10 +126,10 @@ func (vb *Varnishlogbeat) harvest() error {
 				var value interface{}
 				switch {
 				case len(header) == 2:
-					value = header[1]
+					value = strings.TrimSpace(header[1])
 				// if the header is too long, header and value might get truncated
 				default:
-					value = "truncated"
+					value = "nil"
 				}
 				if _, ok := tx[tag]; ok {
 					tx[tag].(common.MapStr)[key] = value
