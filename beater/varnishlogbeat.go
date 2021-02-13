@@ -125,8 +125,6 @@ func (vb *Varnishlogbeat) harvest() error {
 				key := header[0]
 				var value interface{}
 				switch {
-				case key == "Content-Length":
-					value, _ = strconv.Atoi(header[1])
 				case len(header) == 2:
 					value = header[1]
 				// if the header is too long, header and value might get truncated
@@ -136,7 +134,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				if _, ok := tx[tag]; ok {
 					tx[tag].(common.MapStr)[key] = value
 				} else {
-					tx[tag] = common.MapStr{key: value}
+					logp.Info("KEK ERROR!")
 				}
 			default:
 				tx[tag] = data
