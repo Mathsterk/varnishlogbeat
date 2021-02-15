@@ -164,8 +164,9 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = "UNKNOWN"
 					value = strings.TrimSpace(header[0])
 				}
-
-				vcllog[level][key] = append(vcllog[level][key], value)
+				if _, ok := vcllog[level][key]; ok {
+					vcllog[level][key] = append(vcllog[level][key], value)
+				}
 
 			// case "VCL_Log":
 			// 	header := strings.SplitN(data, ":", 2)
