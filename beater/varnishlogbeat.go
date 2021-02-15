@@ -162,22 +162,22 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = strings.TrimSpace(header[0])
 					value = ""
 				}
-				if _, ok := txcounter[level][key]; ok {
-					count := strconv.FormatUint(txcounter[level][key], 10)
-					// fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
-					tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-					// txcounter[level][key] += 1
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				} else {
-					if _, oki := txcounter[level]; oki {
-						if _, oke := txcounter[level][key]; oke {
-						} else {
-							txcounter[level][key] = 1
-						}
+				count := strconv.FormatUint(txcounter[level][key], 10)
+				// fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
+				tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
+				// txcounter[level][key] += 1
+				// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				if _, oki := txcounter[level]; oki {
+					if _, oke := txcounter[level][key]; oke {
+						txcounter[level][key] += 1
 					} else {
-						txcounter[level] = map[string]uint64{}
 						txcounter[level][key] = 1
 					}
+				} else {
+					txcounter[level] = map[string]uint64{}
+					txcounter[level][key] = 1
+				}
+				if _, ok := tx[tag]; ok {
 					tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{"0": value}}}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
