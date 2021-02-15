@@ -193,6 +193,10 @@ func (vb *Varnishlogbeat) harvest() error {
 
 				// count += "tre"
 
+				if false {
+					tx[tag] = value
+				}
+
 				// if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
 				// 	tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
 				// } else {
