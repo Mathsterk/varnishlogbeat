@@ -64,6 +64,7 @@ func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
 	// txcounter := make(map[string]uint64)
+	vcllog := make(map[string]map[string][]interface{})
 
 	vb.varnish.Log("",
 		vago.REQ,
@@ -129,6 +130,7 @@ func (vb *Varnishlogbeat) harvest() error {
 					"type":       _type,
 					"vxid":       vxid,
 					"tx":         tx,
+					"VCL_Log":    vcllog,
 				}
 				vb.client.PublishEvent(event)
 				counter++
@@ -143,13 +145,14 @@ func (vb *Varnishlogbeat) harvest() error {
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				var value interface{}
-				// level, key, value := "UNKNOWN", "", ""
-				key, value := "", ""
+				level, key, value := "UNKNOWN", "", ""
+				// key, value := "", ""
 				switch {
 				case len(header) == 2:
 					split := strings.SplitN(header[0], "_", 2)
 					switch {
 					case len(split) == 2:
+						level = strings.TrimSpace(split[0])
 						key = strings.TrimSpace(split[1])
 						value = strings.TrimSpace(header[1])
 					default:
@@ -161,13 +164,9 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = "UNKNOWN"
 					value = strings.TrimSpace(header[0])
 				}
-				if _, ok := tx[tag]; ok {
-					tx[tag].(common.MapStr)[key] = value
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				} else {
-					tx[tag] = common.MapStr{key: value}
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				}
+
+				vcllog[level][key] = append(vcllog[level][key], value)
+
 			// case "VCL_Log":
 			// 	header := strings.SplitN(data, ":", 2)
 			// 	var value interface{}
