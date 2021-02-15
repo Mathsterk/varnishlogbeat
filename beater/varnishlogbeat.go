@@ -179,10 +179,10 @@ func (vb *Varnishlogbeat) harvest() error {
 				// }
 
 				if _, ok := txcounter[level][key]; ok {
-					txcounter[level][key] += 1
+					// txcounter[level][key] += 1
 				} else {
 					if _, oki := txcounter[level]; oki {
-						txcounter[level][key] = 1
+						// txcounter[level][key] = 1
 					} else {
 						txcounter[level] = map[string]uint64{}
 						txcounter[level][key] = 1
