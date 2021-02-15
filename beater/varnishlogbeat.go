@@ -169,9 +169,8 @@ func (vb *Varnishlogbeat) harvest() error {
 					// txcounter[level][key] += 1
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
-					if _, ok := txcounter[level]; ok {
-						if _, ok := txcounter[level][key]; ok {
-							txcounter[level][key] += 1
+					if _, oki := txcounter[level]; oki {
+						if _, oke := txcounter[level][key]; oke {
 						} else {
 							txcounter[level][key] = 1
 						}
