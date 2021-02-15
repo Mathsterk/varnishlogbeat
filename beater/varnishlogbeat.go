@@ -187,6 +187,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				"VCL_use",
 				"VCL_return":
 				if _, ok := tx[tag]; ok {
+					tx[tag].(common.StringSet).Add(data)
 				} else {
 					tx[tag] = common.MakeStringSet(data)
 				}
