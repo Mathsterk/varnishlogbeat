@@ -138,7 +138,7 @@ func (vb *Varnishlogbeat) harvest() error {
 					value = strings.TrimSpace(header[1])
 				// if the header is too long, header and value might get truncated
 				default:
-					value = "nil"
+					value = ""
 				}
 				if _, ok := tx[tag]; ok {
 					count := strconv.FormatUint(txcounter[string(key)], 10)
