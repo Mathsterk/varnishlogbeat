@@ -186,13 +186,13 @@ func (vb *Varnishlogbeat) harvest() error {
 			case "VCL_call",
 				"VCL_use",
 				"VCL_return":
-				if _, ok := tx[tag]; ok {
-					count := strconv.FormatUint(txcounter[string(data)], 10)
+				if _, ok := txcounter[tag+string(data)]; ok {
+					count := strconv.FormatUint(txcounter[tag+string(data)], 10)
 					tx[tag].(common.MapStr)[count] = data
-					txcounter[string(data)] += 1
+					txcounter[tag+string(data)] += 1
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
-					txcounter[string(data)] = 1
+					txcounter[tag+string(data)] = 1
 					tx[tag] = common.MapStr{"0": data}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
