@@ -147,7 +147,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				level, key, value := "UNKNOWN", "", ""
 				switch {
 				case len(header) == 2:
-					split := strings.SplitN(header[0], "_", 1)
+					split := strings.SplitN(header[0], "_", 2)
 					switch {
 					case len(split) == 2:
 						level = strings.TrimSpace(split[0])
