@@ -63,8 +63,7 @@ func (vb *Varnishlogbeat) Run(b *beat.Beat) error {
 func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
-	// txcounter := make(map[string]uint64)
-	vcllog := make(map[string]map[string][]interface{})
+	txcounter := make(map[string]uint64)
 
 	vb.varnish.Log("",
 		vago.REQ,
@@ -130,7 +129,6 @@ func (vb *Varnishlogbeat) harvest() error {
 					"type":       _type,
 					"vxid":       vxid,
 					"tx":         tx,
-					"VCL_Log":    vcllog,
 				}
 				vb.client.PublishEvent(event)
 				counter++
@@ -140,13 +138,13 @@ func (vb *Varnishlogbeat) harvest() error {
 				tx = nil
 				tx = make(common.MapStr)
 
-				// txcounter = nil
-				// txcounter = make(map[string]uint64)
+				txcounter = nil
+				txcounter = make(map[string]uint64)
+
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				var value interface{}
-				level, key, value := "UNKNOWN", "", ""
-				// key, value := "", ""
+				level, key, value := "", "", ""
 				switch {
 				case len(header) == 2:
 					split := strings.SplitN(header[0], "_", 2)
@@ -156,51 +154,26 @@ func (vb *Varnishlogbeat) harvest() error {
 						key = strings.TrimSpace(split[1])
 						value = strings.TrimSpace(header[1])
 					default:
+						level = "UNKNOWN"
 						key = strings.TrimSpace(header[0])
 						value = strings.TrimSpace(header[1])
 					}
 				// if the header is too long, header and value might get truncated
 				default:
-					key = "UNKNOWN"
-					value = strings.TrimSpace(header[0])
+					level = "UNKNOWN"
+					key = strings.TrimSpace(header[0])
+					value = ""
 				}
-				if _, ok := vcllog[level][key]; ok {
-					vcllog[level][key] = append(vcllog[level][key], value)
+				if _, ok := tx[tag]; ok {
+					count := strconv.FormatUint(txcounter[string(key)], 10)
+					tx[tag].(common.MapStr)[level+"_"+key+"_"+count] = value
+					txcounter[string(key)] += 1
+					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				} else {
+					txcounter[string(key)] = 1
+					tx[tag] = common.MapStr{level + "_" + key + "_" + "0": value}
+					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
-
-			// case "VCL_Log":
-			// 	header := strings.SplitN(data, ":", 2)
-			// 	var value interface{}
-			// 	level, key, value := "", "", ""
-			// 	switch {
-			// 	case len(header) == 2:
-			// 		split := strings.SplitN(header[0], "_", 2)
-			// 		switch {
-			// 		case len(split) == 2:
-			// 			level = strings.TrimSpace(split[0])
-			// 			key = strings.TrimSpace(split[1])
-			// 			value = strings.TrimSpace(header[1])
-			// 		default:
-			// 			level = "UNKNOWN"
-			// 			key = strings.TrimSpace(header[0])
-			// 			value = strings.TrimSpace(header[1])
-			// 		}
-			// 	// if the header is too long, header and value might get truncated
-			// 	default:
-			// 		level = "UNKNOWN"
-			// 		key = strings.TrimSpace(header[0])
-			// 		value = ""
-			// 	}
-			// 	if _, ok := tx[tag]; ok {
-			// 		count := strconv.FormatUint(txcounter[string(key)], 10)
-			// 		tx[tag].(common.MapStr)[level+"_"+key+"_"+count] = value
-			// 		txcounter[string(key)] += 1
-			// 		// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-			// 	} else {
-			// 		txcounter[string(key)] = 1
-			// 		tx[tag] = common.MapStr{level + "_" + key + "_" + "0": value}
-			// 		// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-			// 	}
 			// case "VCL_acl":
 			// 	header := strings.SplitN(data, " ", 2)
 			// 	key := header[0]
