@@ -125,10 +125,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				txcounter = nil
 				txcounter = make(map[string]uint64)
 
-			case "VCL_call",
-				"VCL_use",
-				"VCL_return",
-				"VCL_Log":
+			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				key := header[0]
 				var value interface{}
@@ -168,6 +165,20 @@ func (vb *Varnishlogbeat) harvest() error {
 				} else {
 					txcounter[string(key)] = 1
 					tx[tag] = common.MapStr{key + "." + "0": value}
+					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				}
+			case "VCL_call",
+				"VCL_use",
+				"VCL_return":
+				key := data
+				if _, ok := tx[tag]; ok {
+					count := strconv.FormatUint(txcounter[string(key)], 10)
+					tx[tag].(common.MapStr)[count] = key
+					txcounter[string(key)] += 1
+					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				} else {
+					txcounter[string(key)] = 1
+					tx[tag] = common.MapStr{"0": key}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
 			default:
