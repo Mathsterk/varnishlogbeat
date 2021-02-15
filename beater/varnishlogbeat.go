@@ -178,9 +178,13 @@ func (vb *Varnishlogbeat) harvest() error {
 					txcounter[level][key] = 1
 				}
 				if _, ok := tx[tag]; ok {
-					// count := strconv.FormatUint(txcounter[level][key], 10)
-					tx[tag].(common.MapStr)[level].(common.MapStr)[key] = value
-					txcounter[level][key] += 1
+					count := strconv.FormatUint(txcounter[level][key], 10)
+					if _, oka := tx[tag].(common.MapStr)[level]; oka {
+						if _, oku := tx[tag].(common.MapStr)[level].(common.MapStr)[count]; oku {
+							tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
+							txcounter[level][key] += 1
+						}
+					}
 				} else {
 					tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{"0": value}}}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
