@@ -144,7 +144,7 @@ func (vb *Varnishlogbeat) harvest() error {
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				var value interface{}
-				level, key, value := "UNKNOWN", "nil", "nil"
+				level, key, value := "UNKNOWN", "lul", "lul"
 				switch {
 				case len(header) == 2:
 					split := strings.SplitN(header[0], "_", 2)
@@ -160,7 +160,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				// if the header is too long, header and value might get truncated
 				default:
 					key = strings.TrimSpace(header[0])
-					value = "nil"
+					value = "lul"
 				}
 				// count := strconv.FormatUint(txcounter[level][key], 10)
 				// fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
