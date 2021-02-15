@@ -63,7 +63,7 @@ func (vb *Varnishlogbeat) Run(b *beat.Beat) error {
 func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
-	txcounter := make(map[string]map[string]uint64)
+	// txcounter := make(map[string]map[string]uint64)
 
 	vb.varnish.Log("",
 		vago.REQ,
@@ -138,8 +138,8 @@ func (vb *Varnishlogbeat) harvest() error {
 				tx = nil
 				tx = make(common.MapStr)
 
-				txcounter = nil
-				txcounter = make(map[string]map[string]uint64)
+				// txcounter = nil
+				// txcounter = make(map[string]map[string]uint64)
 
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
@@ -162,6 +162,23 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = strings.TrimSpace(header[0])
 					value = "lul"
 				}
+
+				if _, ok := tx[tag]; ok {
+					// if _, oki := tx[tag].(common.MapStr)[level]; oki {
+					// 	if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
+					// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.StringSet).Add(value)
+					// 	} else {
+					// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
+					// 	}
+					// } else {
+					// 	tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
+					// }
+				} else {
+					var test []string
+					test = append(test, fmt.Sprintf("%v", value))
+					tx[tag] = common.MapStr{level: common.MapStr{key: test}}
+				}
+
 				// count := strconv.FormatUint(txcounter[level][key], 10)
 				// fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
 				// tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
@@ -178,37 +195,37 @@ func (vb *Varnishlogbeat) harvest() error {
 				// 	txcounter[level][key] = 1
 				// }
 
-				if _, ok := txcounter[level][key]; ok {
-					txcounter[level][key] += 1
-				} else {
-					if _, oki := txcounter[level]; oki {
-						txcounter[level][key] = 1
-					} else {
-						txcounter[level] = map[string]uint64{}
-						txcounter[level][key] = 1
-					}
-				}
+				// if _, ok := txcounter[level][key]; ok {
+				// 	txcounter[level][key] += 1
+				// } else {
+				// 	if _, oki := txcounter[level]; oki {
+				// 		txcounter[level][key] = 1
+				// 	} else {
+				// 		txcounter[level] = map[string]uint64{}
+				// 		txcounter[level][key] = 1
+				// 	}
+				// }
 
-				count := strconv.FormatUint(txcounter[level][key], 10)
+				// count := strconv.FormatUint(txcounter[level][key], 10)
 
 				// if false {
 				// 	tx[tag] = value
 				// 	tx[tag] = count
 				// }
 
-				if _, ok := tx[tag]; ok {
-					if _, oki := tx[tag].(common.MapStr)[level]; oki {
-						if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
-							tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-						} else {
-							tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
-						}
-					} else {
-						tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
-					}
-				} else {
-					tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
-				}
+				// if _, ok := tx[tag]; ok {
+				// 	if _, oki := tx[tag].(common.MapStr)[level]; oki {
+				// 		if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
+				// 			tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
+				// 		} else {
+				// 			tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
+				// 		}
+				// 	} else {
+				// 		tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
+				// 	}
+				// } else {
+				// 	tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
+				// }
 
 				// if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
 				// 	tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
