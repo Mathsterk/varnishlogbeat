@@ -86,7 +86,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				"RespHeader",
 				"Timestamp":
 				header := strings.SplitN(data, ": ", 2)
-				key := header[0]
+				key := strings.ToLower(header[0])
 				var value interface{}
 				switch {
 				case key == "Content-Length":
