@@ -174,7 +174,7 @@ func (vb *Varnishlogbeat) harvest() error {
 					// tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
 					// }
 				} else {
-					tx[tag] = common.MapStr{level: common.MapStr{key: value}}
+					tx[tag] = common.MapStr{level: common.MapStr{key: val}}
 				}
 
 				// count := strconv.FormatUint(txcounter[level][key], 10)
