@@ -162,17 +162,18 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = strings.TrimSpace(header[0])
 					value = "lul"
 				}
+
 				var val []interface{}
 				val = append(val, value)
 
 				if _, ok := tx[tag]; ok {
-					// if _, oki := tx[tag].(common.MapStr)[level]; oki {
+					if _, oki := tx[tag].(common.MapStr)[level]; oki {
 
-					// tx[tag].(common.MapStr)[level].(common.MapStr)[key] = append(make([]interface{}, 0), tx[tag].(common.MapStr)[level].(common.MapStr)[key])
+						// tx[tag].(common.MapStr)[level].(common.MapStr)[key] = append(make([]interface{}, 0), tx[tag].(common.MapStr)[level].(common.MapStr)[key])
 
-					// } else {
-					// tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
-					// }
+					} else {
+						tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
+					}
 				} else {
 					tx[tag] = common.MapStr{level: common.MapStr{key: val}}
 				}
