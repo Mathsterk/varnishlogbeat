@@ -167,32 +167,44 @@ func (vb *Varnishlogbeat) harvest() error {
 				// tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
 				// txcounter[level][key] += 1
 				// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				if _, oki := txcounter[level]; oki {
-					if _, oke := txcounter[level][key]; oke {
-						txcounter[level][key] += 1
+				// if _, oki := txcounter[level]; oki {
+				// 	if _, oke := txcounter[level][key]; oke {
+				// 		txcounter[level][key] += 1
+				// 	} else {
+				// 		txcounter[level][key] = 1
+				// 	}
+				// } else {
+				// 	txcounter[level] = map[string]uint64{}
+				// 	txcounter[level][key] = 1
+				// }
+
+				if _, ok := txcounter[level][key]; ok {
+					txcounter[level][key] += 1
+				} else {
+					if _, oki := txcounter[level]; oki {
+						txcounter[level][key] = 1
 					} else {
+						txcounter[level] = map[string]uint64{}
 						txcounter[level][key] = 1
 					}
-				} else {
-					txcounter[level] = map[string]uint64{}
-					txcounter[level][key] = 1
 				}
 
 				count := strconv.FormatUint(txcounter[level][key], 10)
 
-				if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; ok {
+				if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
 					tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-
 				} else {
-					if _, oki := tx[tag].(common.MapStr)[level]; oki {
-						tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{"0": value}}
+					if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; ok {
+						tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
 					} else {
-						tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{"0": value}}}
+						if _, oki := tx[tag].(common.MapStr)[level]; oki {
+							tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
+						} else {
+							tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
 
+						}
 					}
 				}
-
-				txcounter[level][key] += 1
 
 				// if _, ok := tx[tag]; ok {
 				// 	count := strconv.FormatUint(txcounter[level][key], 10)
