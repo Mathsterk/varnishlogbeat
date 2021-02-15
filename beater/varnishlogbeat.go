@@ -191,25 +191,24 @@ func (vb *Varnishlogbeat) harvest() error {
 
 				count := strconv.FormatUint(txcounter[level][key], 10)
 
-				if false {
-					tx[tag] = value
-					tx[tag] = count
-				}
-
-				// if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
-				// 	tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-				// } else {
-				// 	if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; ok {
-				// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
-				// 	} else {
-				// 		if _, oki := tx[tag].(common.MapStr)[level]; oki {
-				// 			tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
-				// 		} else {
-				// 			tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
-
-				// 		}
-				// 	}
+				// if false {
+				// 	tx[tag] = value
+				// 	tx[tag] = count
 				// }
+
+				if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
+					tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
+				} else {
+					if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; ok {
+						tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
+					} else {
+						if _, oki := tx[tag].(common.MapStr)[level]; oki {
+							tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
+						} else {
+							tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
+						}
+					}
+				}
 
 				// if _, ok := tx[tag]; ok {
 				// 	count := strconv.FormatUint(txcounter[level][key], 10)
