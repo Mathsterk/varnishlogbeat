@@ -162,9 +162,8 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = strings.TrimSpace(header[0])
 					value = "lul"
 				}
-				// text := fmt.Sprintf("%v", value)
-				// var val []string
-				// val = append(val, text)
+				var val []interface{}
+				val = append(val, value)
 
 				if _, ok := tx[tag]; ok {
 					// if _, oki := tx[tag].(common.MapStr)[level]; oki {
