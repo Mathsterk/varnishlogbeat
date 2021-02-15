@@ -166,12 +166,12 @@ func (vb *Varnishlogbeat) harvest() error {
 				}
 				if _, ok := tx[tag]; ok {
 					count := strconv.FormatUint(txcounter[string(key)], 10)
-					tx[tag].(common.MapStr)[level+"_"+key+"_"+count] = value
+					tx[tag].(common.MapStr)[level+"."+key+"."+count] = value
 					txcounter[string(key)] += 1
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
 					txcounter[string(key)] = 1
-					tx[tag] = common.MapStr{level + "_" + key + "_" + "0": value}
+					tx[tag] = common.MapStr{level + "." + key + "." + "0": value}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
 			// case "VCL_acl":
