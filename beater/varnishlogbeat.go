@@ -197,7 +197,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				// }
 
 				if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
-					// tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
+					tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
 				} //else {
 				// 	if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
 				// 		// tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
