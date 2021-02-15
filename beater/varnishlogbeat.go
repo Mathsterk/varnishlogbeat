@@ -125,7 +125,11 @@ func (vb *Varnishlogbeat) harvest() error {
 				txcounter = nil
 				txcounter = make(map[string]uint64)
 
-			case "VCL_Log":
+			case "VCL_acl",
+				"VCL_call",
+				"VCL_use",
+				"VCL_return",
+				"VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				key := header[0]
 				var value interface{}
