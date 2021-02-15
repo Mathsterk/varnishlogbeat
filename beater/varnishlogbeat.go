@@ -163,13 +163,13 @@ func (vb *Varnishlogbeat) harvest() error {
 					value = ""
 				}
 				if _, ok := tx[tag]; ok {
-					count := strconv.FormatUint(txcounter[string(level)][string(key)], 10)
-					fmt.Printf("%d %s %s\n", txcounter[string(level)][string(key)], key, value)
+					count := strconv.FormatUint(txcounter[level][key], 10)
+					fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
 					tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-					txcounter[string(level)][string(key)] += 1
+					txcounter[level][key] += 1
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
-					txcounter[string(level)][string(key)] = 1
+					txcounter[level][key] = 1
 					tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{"0": value}}}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
