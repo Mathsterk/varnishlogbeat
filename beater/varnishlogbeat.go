@@ -154,13 +154,11 @@ func (vb *Varnishlogbeat) harvest() error {
 						key = strings.TrimSpace(split[1])
 						value = strings.TrimSpace(header[1])
 					default:
-						level = "UNKNOWN"
 						key = strings.TrimSpace(header[0])
 						value = strings.TrimSpace(header[1])
 					}
 				// if the header is too long, header and value might get truncated
 				default:
-					level = "UNKNOWN"
 					key = strings.TrimSpace(header[0])
 					value = ""
 				}
