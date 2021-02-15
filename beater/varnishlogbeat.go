@@ -142,24 +142,32 @@ func (vb *Varnishlogbeat) harvest() error {
 				txcounter = make(map[string]uint64)
 
 			case "VCL_Log":
-				header := strings.SplitN(data, ":", 2)
-				key := header[0]
+				header := strings.SplitN(data, ":", 3)
 				var value interface{}
+				level, key, value := "", "", ""
 				switch {
 				case len(header) == 2:
+					level = "UNKNOWN"
+					key = strings.TrimSpace(header[0])
 					value = strings.TrimSpace(header[1])
+				case len(header) == 3:
+					level = strings.TrimSpace(header[0])
+					key = strings.TrimSpace(header[1])
+					value = strings.TrimSpace(header[2])
 				// if the header is too long, header and value might get truncated
 				default:
+					level = "UNKNOWN"
+					key = strings.TrimSpace(header[0])
 					value = ""
 				}
 				if _, ok := tx[tag]; ok {
 					count := strconv.FormatUint(txcounter[string(key)], 10)
-					tx[tag].(common.MapStr)[key+"."+count] = value
+					tx[tag].(common.MapStr)[level+"."+key+"."+count] = value
 					txcounter[string(key)] += 1
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
 					txcounter[string(key)] = 1
-					tx[tag] = common.MapStr{key + "." + "0": value}
+					tx[tag] = common.MapStr{level + "." + key + "." + "0": value}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
 			// case "VCL_acl":
