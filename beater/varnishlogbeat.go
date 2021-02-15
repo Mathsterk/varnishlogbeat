@@ -189,12 +189,11 @@ func (vb *Varnishlogbeat) harvest() error {
 					}
 				}
 
-				// count := strconv.FormatUint(txcounter[level][key], 10)
-
-				// count += "tre"
+				count := strconv.FormatUint(txcounter[level][key], 10)
 
 				if false {
 					tx[tag] = value
+					tx[tag] = count
 				}
 
 				// if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
