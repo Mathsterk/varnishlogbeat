@@ -169,7 +169,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				if _, ok := tx[tag]; ok {
 					if _, oki := tx[tag].(common.MapStr)[level]; oki {
 						if _, oki := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oki {
-							s := make([]string, 10)
+							s := make([]string, 1)
 							s = append(s, fmt.Sprintf("%v", tx[tag].(common.MapStr)[level].(common.MapStr)[key]))
 							tx[tag].(common.MapStr)[level].(common.MapStr)[key] = append(s, text)
 						}
