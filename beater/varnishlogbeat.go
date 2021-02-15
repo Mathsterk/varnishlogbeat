@@ -63,7 +63,7 @@ func (vb *Varnishlogbeat) Run(b *beat.Beat) error {
 func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
-	txcounter := make(map[string]uint64)
+	txcounter := make(map[string]map[string]uint64)
 
 	vb.varnish.Log("",
 		vago.REQ,
@@ -139,7 +139,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				tx = make(common.MapStr)
 
 				txcounter = nil
-				txcounter = make(map[string]uint64)
+				txcounter = make(map[string]map[string]uint64)
 
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
@@ -162,37 +162,37 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = strings.TrimSpace(header[0])
 					value = ""
 				}
-				if _, ok := txcounter[string(level)+string(key)]; ok {
-					// count := strconv.FormatUint(txcounter[string(level)+string(key)], 10)
-					tx[tag].(common.MapStr)[level] = value //.(common.MapStr)[key].(common.MapStr)["1"] = value
-					txcounter[string(level)+string(key)] += 1
+				if _, ok := txcounter[string(level)][string(key)]; ok {
+					// count := strconv.FormatUint(txcounter[string(level)][string(key)], 10)
+					tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)["1"] = value
+					txcounter[string(level)][string(key)] += 1
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				} else {
-					txcounter[string(level)+string(key)] = 1
+					txcounter[string(level)][string(key)] = 1
 					tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{"0": value}}}
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
 				}
-			case "VCL_acl":
-				header := strings.SplitN(data, " ", 2)
-				key := header[0]
-				var value interface{}
-				switch {
-				case len(header) == 2:
-					value = strings.TrimSpace(header[1])
-				// if the header is too long, header and value might get truncated
-				default:
-					value = "true"
-				}
-				if _, ok := tx[tag]; ok {
-					count := strconv.FormatUint(txcounter[string(key)], 10)
-					tx[tag].(common.MapStr)[key+"."+count] = value
-					txcounter[string(key)] += 1
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				} else {
-					txcounter[string(key)] = 1
-					tx[tag] = common.MapStr{key + "." + "0": value}
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				}
+			// case "VCL_acl":
+			// 	header := strings.SplitN(data, " ", 2)
+			// 	key := header[0]
+			// 	var value interface{}
+			// 	switch {
+			// 	case len(header) == 2:
+			// 		value = strings.TrimSpace(header[1])
+			// 	// if the header is too long, header and value might get truncated
+			// 	default:
+			// 		value = "true"
+			// 	}
+			// 	if _, ok := tx[tag]; ok {
+			// 		count := strconv.FormatUint(txcounter[string(key)], 10)
+			// 		tx[tag].(common.MapStr)[key+"."+count] = value
+			// 		txcounter[string(key)] += 1
+			// 		// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+			// 	} else {
+			// 		txcounter[string(key)] = 1
+			// 		tx[tag] = common.MapStr{key + "." + "0": value}
+			// 		// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+			// 	}
 			case "VCL_call",
 				"VCL_return",
 				"VCL_use":
