@@ -162,21 +162,22 @@ func (vb *Varnishlogbeat) harvest() error {
 					key = strings.TrimSpace(header[0])
 					value = "lul"
 				}
+				text := fmt.Sprintf("%v", value)
+				var val []string
+				val = append(val, text)
 
 				if _, ok := tx[tag]; ok {
-					// if _, oki := tx[tag].(common.MapStr)[level]; oki {
-					// 	if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
-					// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.StringSet).Add(value)
-					// 	} else {
-					// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
-					// 	}
-					// } else {
-					// 	tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
-					// }
+					if _, oki := tx[tag].(common.MapStr)[level]; oki {
+						if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
+							// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.StringSet).Add(value)
+						} else {
+							tx[tag].(common.MapStr)[level].(common.MapStr)[key] = val
+						}
+					} else {
+						tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
+					}
 				} else {
-					var test []string
-					test = append(test, fmt.Sprintf("%v", value))
-					tx[tag] = common.MapStr{level: common.MapStr{key: test}}
+					tx[tag] = common.MapStr{level: common.MapStr{key: val}}
 				}
 
 				// count := strconv.FormatUint(txcounter[level][key], 10)
