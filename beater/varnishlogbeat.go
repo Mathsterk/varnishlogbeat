@@ -83,8 +83,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				"BerespHeader",
 				"ObjHeader",
 				"ReqHeader",
-				"RespHeader",
-				"Timestamp":
+				"RespHeader":
 				header := strings.SplitN(data, ": ", 2)
 				key := strings.ToLower(header[0])
 				var value interface{}
@@ -102,7 +101,24 @@ func (vb *Varnishlogbeat) harvest() error {
 				} else {
 					tx[tag] = common.MapStr{key: value}
 				}
-
+			case "Timestamp":
+				header := strings.SplitN(data, ": ", 2)
+				key := header[0]
+				var value interface{}
+				switch {
+				case key == "Content-Length":
+					value, _ = strconv.Atoi(header[1])
+				case len(header) == 2:
+					value = header[1]
+				// if the header is too long, header and value might get truncated
+				default:
+					value = "truncated"
+				}
+				if _, ok := tx[tag]; ok {
+					tx[tag].(common.MapStr)[key] = value
+				} else {
+					tx[tag] = common.MapStr{key: value}
+				}
 			case "Length":
 				tx[tag], _ = strconv.Atoi(data)
 
