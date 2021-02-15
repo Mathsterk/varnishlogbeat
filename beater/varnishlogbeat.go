@@ -200,7 +200,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				"VCL_use":
 				key := data
 				var value interface{}
-				value = "asdasd"
+				value = "true"
 				if _, ok := tx[tag]; ok {
 					tx[tag].(common.MapStr)[key] = value
 					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
