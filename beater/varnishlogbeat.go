@@ -144,10 +144,10 @@ func (vb *Varnishlogbeat) harvest() error {
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				var value interface{}
-				level, key, value := "", "", ""
+				level, key, value := "UNKNOWN", "", ""
 				switch {
 				case len(header) == 2:
-					split := strings.SplitN(header[0], "_", 2)
+					split := strings.SplitN(header[0], "_", 1)
 					switch {
 					case len(split) == 2:
 						level = strings.TrimSpace(split[0])
