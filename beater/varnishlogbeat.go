@@ -130,7 +130,7 @@ func (vb *Varnishlogbeat) harvest() error {
 					"type":       _type,
 					"vxid":       vxid,
 					"tx":         tx,
-					"tx.VCL_Log": vcllog,
+					"VCL_Log":    vcllog,
 				}
 				vb.client.PublishEvent(event)
 				counter++
