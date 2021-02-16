@@ -190,7 +190,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				value = data
 
 				if _, ok := vcldata[tag]; ok {
-					// vcllog[key] = append(vcllog[key], value)
+					vcldata[tag] = append(vcldata[tag], value)
 				} else {
 					vcldata[tag] = make([]interface{}, 0)
 					vcldata[tag] = append(vcldata[tag], value)
