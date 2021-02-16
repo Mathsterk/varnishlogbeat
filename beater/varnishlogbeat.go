@@ -64,7 +64,7 @@ func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
 	vcllog := make(map[string]map[string][]interface{}, 0)
-	// txcounter := make(map[string]map[string]uint64)
+	vcldata := make(map[string][]interface{}, 0)
 
 	vb.varnish.Log("",
 		vago.REQ,
@@ -131,6 +131,7 @@ func (vb *Varnishlogbeat) harvest() error {
 					"vxid":       vxid,
 					"tx":         tx,
 					"VCL_Log":    vcllog,
+					"VCL_data":   vcldata,
 				}
 				vb.client.PublishEvent(event)
 				counter++
@@ -142,14 +143,13 @@ func (vb *Varnishlogbeat) harvest() error {
 
 				vcllog = nil
 				vcllog = make(map[string]map[string][]interface{}, 0)
-
-				// txcounter = nil
-				// txcounter = make(map[string]map[string]uint64)
+				vcldata = nil
+				vcldata = make(map[string][]interface{}, 0)
 
 			case "VCL_Log":
 				header := strings.SplitN(data, ":", 2)
 				var value interface{}
-				level, key, value := "UNKNOWN", "lul", "lul"
+				level, key, value := "UNKNOWN", "null", "null"
 				switch {
 				case len(header) == 2:
 					split := strings.SplitN(header[0], "_", 2)
@@ -165,7 +165,7 @@ func (vb *Varnishlogbeat) harvest() error {
 				// if the header is too long, header and value might get truncated
 				default:
 					key = strings.TrimSpace(header[0])
-					value = "lul"
+					value = "null"
 				}
 
 				if _, ok := vcllog[level]; ok {
@@ -181,137 +181,28 @@ func (vb *Varnishlogbeat) harvest() error {
 					vcllog[level][key] = append(vcllog[level][key], value)
 				}
 
-				// var val []interface{}
-
-				// if _, ok := tx[tag]; ok {
-				// 	if _, oki := tx[tag].(common.MapStr)[level]; oki {
-				// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key]
-				// 	} else {
-				// 		val = append(val, value)
-				// 		tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
-				// 	}
-				// } else {
-				// 	val = append(val, value)
-				// 	tx[tag] = common.MapStr{level: common.MapStr{key: val}}
-				// }
-
-				// count := strconv.FormatUint(txcounter[level][key], 10)
-				// fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
-				// tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-				// txcounter[level][key] += 1
-				// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				// if _, oki := txcounter[level]; oki {
-				// 	if _, oke := txcounter[level][key]; oke {
-				// 		txcounter[level][key] += 1
-				// 	} else {
-				// 		txcounter[level][key] = 1
-				// 	}
-				// } else {
-				// 	txcounter[level] = map[string]uint64{}
-				// 	txcounter[level][key] = 1
-				// }
-
-				// if _, ok := txcounter[level][key]; ok {
-				// 	txcounter[level][key] += 1
-				// } else {
-				// 	if _, oki := txcounter[level]; oki {
-				// 		txcounter[level][key] = 1
-				// 	} else {
-				// 		txcounter[level] = map[string]uint64{}
-				// 		txcounter[level][key] = 1
-				// 	}
-				// }
-
-				// count := strconv.FormatUint(txcounter[level][key], 10)
-
-				// if false {
-				// 	tx[tag] = value
-				// 	tx[tag] = count
-				// }
-
-				// if _, ok := tx[tag]; ok {
-				// 	if _, oki := tx[tag].(common.MapStr)[level]; oki {
-				// 		if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
-				// 			tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-				// 		} else {
-				// 			tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
-				// 		}
-				// 	} else {
-				// 		tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
-				// 	}
-				// } else {
-				// 	tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
-				// }
-
-				// if _, ok := tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count]; ok {
-				// 	tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-				// } else {
-				// 	if _, oka := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oka {
-				// 		// tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
-				// 	} else {
-				// 		if _, oki := tx[tag].(common.MapStr)[level]; oki {
-				// 			// tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
-				// 		} else {
-				// 			if _, oku := tx[tag]; oku {
-				// 				// tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
-				// 			} else {
-				// 				tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{count: value}}}
-				// 			}
-				// 		}
-				// 	}
-				// }
-
-				// if _, ok := tx[tag]; ok {
-				// 	count := strconv.FormatUint(txcounter[level][key], 10)
-				// 	if _, oka := tx[tag].(common.MapStr)[level]; oka {
-				// 		if _, oku := tx[tag].(common.MapStr)[level].(common.MapStr)[key]; oku {
-				// 			tx[tag].(common.MapStr)[level].(common.MapStr)[key].(common.MapStr)[count] = value
-				// 			txcounter[level][key] += 1
-				// 		} else {
-				// 			tx[tag].(common.MapStr)[level].(common.MapStr)[key] = common.MapStr{count: value}
-				// 			txcounter[level][key] += 1
-				// 		}
-				// 	} else {
-				// 		tx[tag].(common.MapStr)[level] = common.MapStr{key: common.MapStr{count: value}}
-				// 	}
-				// } else {
-				// 	tx[tag] = common.MapStr{level: common.MapStr{key: common.MapStr{"0": value}}}
-				// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-				// }
-			// case "VCL_acl":
-			// 	header := strings.SplitN(data, " ", 2)
-			// 	key := header[0]
-			// 	var value interface{}
-			// 	switch {
-			// 	case len(header) == 2:
-			// 		value = strings.TrimSpace(header[1])
-			// 	// if the header is too long, header and value might get truncated
-			// 	default:
-			// 		value = "true"
-			// 	}
-			// 	if _, ok := tx[tag]; ok {
-			// 		count := strconv.FormatUint(txcounter[string(key)], 10)
-			// 		tx[tag].(common.MapStr)[key+"."+count] = value
-			// 		txcounter[string(key)] += 1
-			// 		// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-			// 	} else {
-			// 		txcounter[string(key)] = 1
-			// 		tx[tag] = common.MapStr{key + "." + "0": value}
-			// 		// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-			// 	}
 			case "VCL_call",
 				"VCL_return",
 				"VCL_use":
-				key := data
+				// vcldata := map[string][]interface{}
+
 				var value interface{}
-				value = "true"
-				if _, ok := tx[tag]; ok {
-					tx[tag].(common.MapStr)[key] = value
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				value = data
+
+				if _, ok := vcldata[tag]; ok {
+					// vcllog[key] = append(vcllog[key], value)
 				} else {
-					tx[tag] = common.MapStr{key: value}
-					// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+					vcldata[tag] = make([]interface{}, 0)
+					vcldata[tag] = append(vcldata[tag], value)
 				}
+
+				// if _, ok := tx[tag]; ok {
+				// 	tx[tag].(common.MapStr)[key] = value
+				// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				// } else {
+				// 	tx[tag] = common.MapStr{key: value}
+				// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+				// }
 			default:
 				tx[tag] = data
 			}
