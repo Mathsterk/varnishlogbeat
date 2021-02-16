@@ -63,6 +63,7 @@ func (vb *Varnishlogbeat) Run(b *beat.Beat) error {
 func (vb *Varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
+	vcllog := make(map[string]map[string][]interface{}, 0)
 	// txcounter := make(map[string]map[string]uint64)
 
 	vb.varnish.Log("",
@@ -129,6 +130,7 @@ func (vb *Varnishlogbeat) harvest() error {
 					"type":       _type,
 					"vxid":       vxid,
 					"tx":         tx,
+					"tx.VCL_Log": vcllog,
 				}
 				vb.client.PublishEvent(event)
 				counter++
@@ -137,6 +139,9 @@ func (vb *Varnishlogbeat) harvest() error {
 				// destroy and re-create the map
 				tx = nil
 				tx = make(common.MapStr)
+
+				vcllog = nil
+				vcllog = make(map[string]map[string][]interface{}, 0)
 
 				// txcounter = nil
 				// txcounter = make(map[string]map[string]uint64)
@@ -163,19 +168,30 @@ func (vb *Varnishlogbeat) harvest() error {
 					value = "lul"
 				}
 
-				var val []interface{}
-
-				if _, ok := tx[tag]; ok {
-					if _, oki := tx[tag].(common.MapStr)[level]; oki {
-						tx[tag].(common.MapStr)[level].(common.MapStr)[key] = append(make([]interface{}, 0), tx[tag].(common.MapStr)[level].(common.MapStr)[key])
-					} else {
-						val = append(val, value)
-						tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
-					}
+				if _, ok := vcllog[level]; ok {
+					// if _, oki := vcllog[level][key]; oki {
+					// } else {
+					// vcllog[level][key] = make([]interface{}, 0)
+					// }
 				} else {
-					val = append(val, value)
-					tx[tag] = common.MapStr{level: common.MapStr{key: val}}
+					vcllog[level] = make(map[string][]interface{})
+					vcllog[level][key] = make([]interface{}, 0)
+					vcllog[level][key] = append(vcllog[level][key], value)
 				}
+
+				// var val []interface{}
+
+				// if _, ok := tx[tag]; ok {
+				// 	if _, oki := tx[tag].(common.MapStr)[level]; oki {
+				// 		tx[tag].(common.MapStr)[level].(common.MapStr)[key]
+				// 	} else {
+				// 		val = append(val, value)
+				// 		tx[tag].(common.MapStr)[level] = common.MapStr{key: val}
+				// 	}
+				// } else {
+				// 	val = append(val, value)
+				// 	tx[tag] = common.MapStr{level: common.MapStr{key: val}}
+				// }
 
 				// count := strconv.FormatUint(txcounter[level][key], 10)
 				// fmt.Printf("%d %s %s\n", txcounter[level][key], key, value)
