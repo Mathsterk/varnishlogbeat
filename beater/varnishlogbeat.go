@@ -169,10 +169,12 @@ func (vb *Varnishlogbeat) harvest() error {
 				}
 
 				if _, ok := vcllog[level]; ok {
-					// if _, oki := vcllog[level][key]; oki {
-					// } else {
-					// vcllog[level][key] = make([]interface{}, 0)
-					// }
+					if _, oki := vcllog[level][key]; oki {
+						vcllog[level][key] = append(vcllog[level][key], value)
+					} else {
+						vcllog[level][key] = make([]interface{}, 0)
+						vcllog[level][key] = append(vcllog[level][key], value)
+					}
 				} else {
 					vcllog[level] = make(map[string][]interface{})
 					vcllog[level][key] = make([]interface{}, 0)
