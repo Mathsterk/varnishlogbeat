@@ -89,8 +89,8 @@ func (bt *varnishlogbeat) Stop() {
 func (bt *varnishlogbeat) harvest() error {
 	tx := make(common.MapStr)
 	counter := 1
-	// vcllog := make(map[string]map[string][]interface{}, 0)
-	// vcldata := make(map[string][]interface{}, 0)
+	vcllog := make(map[string]map[string][]interface{}, 0)
+	vcldata := make(map[string][]interface{}, 0)
 	halt := false
 	vagoerror := errors.New("")
 	for !halt {
@@ -108,71 +108,71 @@ func (bt *varnishlogbeat) harvest() error {
 				}
 
 				switch tag {
-				// case "BereqHeader",
-				// 	"BerespHeader",
-				// 	"ObjHeader",
-				// 	"ReqHeader",
-				// 	"RespHeader":
-				// 	header := strings.SplitN(data, ": ", 2)
-				// 	key := strings.ToLower(header[0])
-				// 	var value interface{}
-				// 	switch {
-				// 	case key == "Content-Length":
-				// 		value, _ = strconv.Atoi(header[1])
-				// 	case len(header) == 2:
-				// 		value = header[1]
-				// 	// if the header is too long, header and value might get truncated
-				// 	default:
-				// 		value = "truncated"
-				// 	}
-				// 	if _, ok := tx[tag]; ok {
-				// 		tx[tag].(common.MapStr)[key] = value
-				// 	} else {
-				// 		tx[tag] = common.MapStr{key: value}
-				// 	}
-				// case "Timestamp":
-				// 	header := strings.SplitN(data, ": ", 2)
-				// 	key := header[0]
-				// 	var value interface{}
-				// 	switch {
-				// 	case key == "Content-Length":
-				// 		value, _ = strconv.Atoi(header[1])
-				// 	case len(header) == 2:
-				// 		value = header[1]
-				// 	// if the header is too long, header and value might get truncated
-				// 	default:
-				// 		value = "truncated"
-				// 	}
-				// 	if _, ok := tx[tag]; ok {
-				// 		tx[tag].(common.MapStr)[key] = value
-				// 	} else {
-				// 		tx[tag] = common.MapStr{key: value}
-				// 	}
-				// case "Length":
-				// 	tx[tag], _ = strconv.Atoi(data)
+				case "BereqHeader",
+					"BerespHeader",
+					"ObjHeader",
+					"ReqHeader",
+					"RespHeader":
+					header := strings.SplitN(data, ": ", 2)
+					key := strings.ToLower(header[0])
+					var value interface{}
+					switch {
+					case key == "Content-Length":
+						value, _ = strconv.Atoi(header[1])
+					case len(header) == 2:
+						value = header[1]
+					// if the header is too long, header and value might get truncated
+					default:
+						value = "truncated"
+					}
+					if _, ok := tx[tag]; ok {
+						tx[tag].(common.MapStr)[key] = value
+					} else {
+						tx[tag] = common.MapStr{key: value}
+					}
+				case "Timestamp":
+					header := strings.SplitN(data, ": ", 2)
+					key := header[0]
+					var value interface{}
+					switch {
+					case key == "Content-Length":
+						value, _ = strconv.Atoi(header[1])
+					case len(header) == 2:
+						value = header[1]
+					// if the header is too long, header and value might get truncated
+					default:
+						value = "truncated"
+					}
+					if _, ok := tx[tag]; ok {
+						tx[tag].(common.MapStr)[key] = value
+					} else {
+						tx[tag] = common.MapStr{key: value}
+					}
+				case "Length":
+					tx[tag], _ = strconv.Atoi(data)
 
 				case "End":
-					// event := common.MapStr{
-					// 	"@timestamp": common.Time(time.Now()),
-					// 	"count":      counter,
-					// 	"type":       _type,
-					// 	"vxid":       vxid,
-					// 	"tx":         tx,
-					// 	"VCL_Log":    vcllog,
-					// 	"VCL_data":   vcldata,
-					// }
-					// bt.client.Publish(event)
+					event := common.MapStr{
+						"@timestamp": common.Time(time.Now()),
+						"count":      counter,
+						"type":       _type,
+						"vxid":       vxid,
+						"tx":         tx,
+						"VCL_Log":    vcllog,
+						"VCL_data":   vcldata,
+					}
+					bt.client.Publish(event)
 
 					event := beat.Event{
 						Timestamp: time.Now(),
 						Fields: common.MapStr{
-							// "type":    b.Info.Name,
+							"type":    b.Info.Name,
 							"count": counter,
 							"type":  _type,
 							"vxid":  vxid,
 							"tx":    tx,
-							// "VCL_Log":  vcllog,
-							// "VCL_data": vcldata,
+							"VCL_Log":  vcllog,
+							"VCL_data": vcldata,
 						},
 					}
 					bt.client.Publish(event)
@@ -184,70 +184,70 @@ func (bt *varnishlogbeat) harvest() error {
 					tx = nil
 					tx = make(common.MapStr)
 
-					// vcllog = nil
-					// vcllog = make(map[string]map[string][]interface{}, 0)
-					// vcldata = nil
-					// vcldata = make(map[string][]interface{}, 0)
+					vcllog = nil
+					vcllog = make(map[string]map[string][]interface{}, 0)
+					vcldata = nil
+					vcldata = make(map[string][]interface{}, 0)
 
-					// case "VCL_Log":
-					// 	header := strings.SplitN(data, ":", 2)
-					// 	var value interface{}
-					// 	level, key, value := "UNKNOWN", "null", "null"
-					// 	switch {
-					// 	case len(header) == 2:
-					// 		split := strings.SplitN(header[0], "_", 2)
-					// 		switch {
-					// 		case len(split) == 2:
-					// 			level = strings.TrimSpace(split[0])
-					// 			key = strings.TrimSpace(split[1])
-					// 			value = strings.TrimSpace(header[1])
-					// 		default:
-					// 			key = strings.TrimSpace(header[0])
-					// 			value = strings.TrimSpace(header[1])
-					// 		}
-					// 	// if the header is too long, header and value might get truncated
-					// 	default:
-					// 		key = strings.TrimSpace(header[0])
-					// 		value = "null"
-					// 	}
+					case "VCL_Log":
+						header := strings.SplitN(data, ":", 2)
+						var value interface{}
+						level, key, value := "UNKNOWN", "null", "null"
+						switch {
+						case len(header) == 2:
+							split := strings.SplitN(header[0], "_", 2)
+							switch {
+							case len(split) == 2:
+								level = strings.TrimSpace(split[0])
+								key = strings.TrimSpace(split[1])
+								value = strings.TrimSpace(header[1])
+							default:
+								key = strings.TrimSpace(header[0])
+								value = strings.TrimSpace(header[1])
+							}
+						// if the header is too long, header and value might get truncated
+						default:
+							key = strings.TrimSpace(header[0])
+							value = "null"
+						}
 
-					// 	if _, ok := vcllog[level]; ok {
-					// 		if _, oki := vcllog[level][key]; oki {
-					// 			vcllog[level][key] = append(vcllog[level][key], value)
-					// 		} else {
-					// 			vcllog[level][key] = make([]interface{}, 0)
-					// 			vcllog[level][key] = append(vcllog[level][key], value)
-					// 		}
-					// 	} else {
-					// 		vcllog[level] = make(map[string][]interface{})
-					// 		vcllog[level][key] = make([]interface{}, 0)
-					// 		vcllog[level][key] = append(vcllog[level][key], value)
-					// 	}
+						if _, ok := vcllog[level]; ok {
+							if _, oki := vcllog[level][key]; oki {
+								vcllog[level][key] = append(vcllog[level][key], value)
+							} else {
+								vcllog[level][key] = make([]interface{}, 0)
+								vcllog[level][key] = append(vcllog[level][key], value)
+							}
+						} else {
+							vcllog[level] = make(map[string][]interface{})
+							vcllog[level][key] = make([]interface{}, 0)
+							vcllog[level][key] = append(vcllog[level][key], value)
+						}
 
-					// case "VCL_call",
-					// 	"VCL_return",
-					// 	"VCL_use":
-					// 	// vcldata := map[string][]interface{}
+					case "VCL_call",
+						"VCL_return",
+						"VCL_use":
+						// vcldata := map[string][]interface{}
 
-					// 	var value interface{}
-					// 	value = data
+						var value interface{}
+						value = data
 
-					// 	if _, ok := vcldata[tag]; ok {
-					// 		vcldata[tag] = append(vcldata[tag], value)
-					// 	} else {
-					// 		vcldata[tag] = make([]interface{}, 0)
-					// 		vcldata[tag] = append(vcldata[tag], value)
-					// 	}
+						if _, ok := vcldata[tag]; ok {
+							vcldata[tag] = append(vcldata[tag], value)
+						} else {
+							vcldata[tag] = make([]interface{}, 0)
+							vcldata[tag] = append(vcldata[tag], value)
+						}
 
-					// 	// if _, ok := tx[tag]; ok {
-					// 	// 	tx[tag].(common.MapStr)[key] = value
-					// 	// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-					// 	// } else {
-					// 	// 	tx[tag] = common.MapStr{key: value}
-					// 	// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
-					// 	// }
-					// default:
-					// 	tx[tag] = data
+						// if _, ok := tx[tag]; ok {
+						// 	tx[tag].(common.MapStr)[key] = value
+						// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+						// } else {
+						// 	tx[tag] = common.MapStr{key: value}
+						// 	// fmt.Printf("%d %s %s\n", txcounter[string(key)], key, value)
+						// }
+					default:
+						tx[tag] = data
 				}
 
 				return 0
