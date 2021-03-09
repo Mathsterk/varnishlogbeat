@@ -7,10 +7,14 @@ import "time"
 
 type Config struct {
 	Period  time.Duration `config:"period"`
+	Backend bool          `config:"backend"`
+	Client  bool          `config:"client"`
 	Path    string        `config:"path"`
 	Timeout time.Duration `config:"timeout"`
 }
 
 var DefaultConfig = Config{
-	Period: 1 * time.Second,
+	Period:  1 * time.Second,
+	Backend: true,
+	Client:  true,
 }
